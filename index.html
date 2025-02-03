@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Configuratore Presse – Plastic Metal</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <style>
+    /* Qualche regola rapida per le immagini, se vuoi dimensioni uniformi */
+    .config-img {
+      width: 280px;
+      height: auto;
+      object-fit: contain; /* per non deformare */
+      margin: 0 5px; /* piccolo distanziamento orizzontale */
+    }
+    .d-none {display: none;}
+  </style>
+</head>
+<body>
+
+<div class="container mt-4">
+  <h1 class="text-center mb-4">Configuratore Presse – Plastic Metal</h1>
+
+  <!-- ============================= RIGA 1: Colonne + Ton + Immagini ============================= -->
+  <div class="row">
+    <!-- Colonna sinistra: Passaggio colonne e Tonnellaggio, uno sotto l'altro -->
+    <div class="col-md-6">
+      <!-- Passaggio colonne -->
+      <div class="mb-3">
+        <label for="colonneInput" class="form-label">
+          Passaggio colonne (HxV)
+        </label>
+        <input
+          type="text"
+          id="colonneInput"
+          class="form-control"
+          placeholder="es. 370x300"
+          onchange="onColonneChange()"
+        />
+      </div>
+<div class="mb-3 d-none" id="divColonneVicini">
+  <label for="colonneViciniSelect" class="form-label">
+    Non trovato. Seleziona un passaggio colonne vicino:
+  </label>
+  <select 
+    id="colonneViciniSelect" 
+    class="form-select"
+    onchange="onSelezionaColonneVicino()"
+  >
+    <option value="">Scegli un passaggio simile</option>
+  </select>
+</div>
+
+      <div class="mb-3">
+  <label for="tonInput" class="form-label">
+    Tonnellaggio
+  </label>
+  <input
+    type="text"
+    id="tonInput"
+    class="form-control"
+    placeholder="es. 80"
+    onchange="onTonChange()"
+  />
+  <!-- il tuo select multiplo -->
+  <select
+    id="tonSceltaMultiple"
+    class="form-select d-none mt-2"
+    onchange="onTonSelezionatoDaSelect()"
+  >
+    <option value="">Scegli un tonnellaggio</option>
+  </select>
+</div>
+
+      <!-- Ton vicini (nuova sezione, nascosta di default) -->
+      <div class="mb-3 d-none" id="divTonVicini">
+        <label for="tonViciniSelect" class="form-label">
+          Non trovato. Seleziona un tonnellaggio vicino:
+        </label>
+        <select 
+          id="tonViciniSelect" 
+          class="form-select"
+          onchange="onSelezionaTonVicino()"
+        >
+          <option value="">Scegli un tonnellaggio simile</option>
+        </select>
+      </div>
+
+      <!-- Eventuale div “Intervalli vicini” per il passaggio colonne -->
+      <div class="mb-3 d-none" id="divColonneVicini">
+        <label for="colonneViciniSelect" class="form-label">
+          Non trovato. Seleziona un passaggio colonne vicino:
+        </label>
+        <select 
+          id="colonneViciniSelect" 
+          class="form-select"
+          onchange="onSelezionaColonneVicino()"
+        >
+          <option value="">Scegli un passaggio simile</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Colonna destra: 2 immagini affiancate (Chiusura + Ton) -->
+    <div class="col-md-6 d-flex align-items-center">
+      <div>
+        <img
+          id="imgChiusura"
+          src=""
+          alt="Chiusura"
+          class="config-img d-none"
+        />
+        <img
+          id="imgTon"
+          src=""
+          alt="Tonnellaggio"
+          class="config-img d-none"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= RIGA 2: Grammatura + Unita + Modello + Immagini (vite/iniezione) ============================= -->
+  <div class="row mt-4">
+    <!-- Colonna sinistra: Grammatura, Unità, Modello, + pulsanti Configura/Azzera -->
+    <div class="col-md-6">
+      <!-- Grammatura -->
+      <div class="mb-3">
+        <label for="grammiSelect" class="form-label">
+          Capacità effettiva iniezione (grammi)
+        </label>
+        <select
+          id="grammiSelect"
+          class="form-select"
+          disabled
+          onchange="popolaUnita(); mostraImgVite();"
+        >
+          <option value="">Seleziona la capacità effettiva iniezione</option>
+        </select>
+      </div>
+
+      <!-- Unità iniezione -->
+      <div class="mb-3">
+        <label for="unitaSelect" class="form-label">Unità di iniezione</label>
+        <select
+          id="unitaSelect"
+          class="form-select"
+          disabled
+          onchange="popolaModello(); mostraImgIniezione();"
+        >
+          <option value="">Seleziona un'unità di iniezione</option>
+        </select>
+      </div>
+
+      <!-- Modello -->
+      <div class="mb-3">
+        <label for="modelloSelect" class="form-label">
+          Modello
+        </label>
+        <select
+          id="modelloSelect"
+          class="form-select"
+          disabled
+        >
+          <option value="">Seleziona il modello</option>
+        </select>
+      </div>
+
+      <!-- Pulsanti Configura/Azzera Filtri -->
+      <div class="d-flex gap-3">
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="configuraPressa()"
+        >
+          Configura
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="azzeraFiltri()"
+        >
+          Azzera filtri
+        </button>
+      </div>
+    </div>
+
+    <!-- Colonna destra: 2 immagini affiancate (vite e iniezione) -->
+    <div class="col-md-6 d-flex align-items-center">
+      <div>
+        <img
+          id="imgVite"
+          src=""
+          alt="Vite"
+          class="config-img d-none"
+        />
+        <img
+          id="imgIniezione"
+          src=""
+          alt="Iniezione"
+          class="config-img d-none"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= RIGA 3: Riepilogo, Accessori, Immagine finale ============================= -->
+  <div class="row mt-4">
+    <!-- Col riepilogo + bottoni Accessori / Azzera Accessori -->
+    <div class="col-md-6">
+      <div id="risultati"></div>
+
+      <div class="mt-3 d-flex gap-3">
+        <button
+          id="btnAccessori"
+          type="button"
+          class="btn btn-outline-primary d-none"
+          data-bs-toggle="modal"
+          data-bs-target="#accessoriModal"
+        >
+          Accessori
+        </button>
+        <button
+          id="btnAzzeraAccessori"
+          type="button"
+          class="btn btn-warning d-none"
+          onclick="azzeraAccessoriFinal()"
+        >
+          Azzera Accessori
+        </button>
+      </div>
+    </div>
+
+    <!-- Col immagine finale configurata -->
+    <div class="col-md-6">
+      <div id="finalImageContainer" class="d-none">
+        <img
+          id="finalModelImage"
+          src=""
+          alt="Modello configurato"
+          class="img-fluid shadow rounded"
+          style="max-width:400px; height:auto;"
+        />
+      </div>
+    </div>
+  </div><!-- fine row -->
+
+</div><!-- fine container -->
+
+
+<!-- ============================= MODAL Accessori ============================= -->
+<div
+  class="modal fade"
+  id="accessoriModal"
+  tabindex="-1"
+  aria-labelledby="accessoriModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="accessoriModalLabel">Seleziona Accessori</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- ROW 3 col per i checkbox -->
+        <div class="row">
+          <!-- col-md-4 (1) -->
+          <div class="col-md-4">
+            
+           <!-- Martinetti idraulici -->
+<div class="form-check mb-2">
+  <input
+    class="form-check-input accCheck"
+    type="checkbox"
+    value="Martinetti idraulici"
+    id="accMartinettiIdr"
+    onchange="toggleQuantityInput(this, 'martIdrQtyContainer')"
+  />
+  <label class="form-check-label" for="accMartinettiIdr">
+    Martinetti idraulici
+  </label>
+</div>
+
+<!-- Div nascosto con DUE campi: piano fisso e piano mobile -->
+<div class="ms-4 mb-2 d-none" id="martIdrQtyContainer">
+  <label for="martIdrFissoQty" class="form-label">Quantità (piano fisso):</label>
+  <input
+    type="number"
+    id="martIdrFissoQty"
+    class="form-control mb-2"
+    min="0"
+    value="0"
+  />
+
+  <label for="martIdrMobileQty" class="form-label">Quantità (piano mobile):</label>
+  <input
+    type="number"
+    id="martIdrMobileQty"
+    class="form-control"
+    min="0"
+    value="0"
+  />
+</div>
+
+<!-- Martinetti pneumatici -->
+<div class="form-check mb-2">
+  <input
+    class="form-check-input accCheck"
+    type="checkbox"
+    value="Martinetti pneumatici"
+    id="accMartinettiPne"
+    onchange="toggleQuantityInput(this, 'martPneQtyContainer')"
+  />
+  <label class="form-check-label" for="accMartinettiPne">
+    Martinetti pneumatici
+  </label>
+</div>
+
+<!-- Div nascosto con DUE campi: piano fisso e piano mobile -->
+<div class="ms-4 mb-2 d-none" id="martPneQtyContainer">
+  <label for="martPneFissoQty" class="form-label">Quantità (piano fisso):</label>
+  <input
+    type="number"
+    id="martPneFissoQty"
+    class="form-control mb-2"
+    min="0"
+    value="0"
+  />
+
+  <label for="martPneMobileQty" class="form-label">Quantità (piano mobile):</label>
+  <input
+    type="number"
+    id="martPneMobileQty"
+    class="form-control"
+    min="0"
+    value="0"
+  />
+</div>
+
+            
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Svitamento idraulico" />
+              <label class="form-check-label">Svitamento idraulico</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Svitamento elettrico" />
+              <label class="form-check-label">Svitamento elettrico</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Serbatoio aria compressa" />
+              <label class="form-check-label">Serbatoio aria compressa</label>
+            </div>
+            
+            <!-- Aria compressa tempor. (con doppia quantità) -->
+<div class="form-check mb-2">
+  <input
+    class="form-check-input accCheck"
+    type="checkbox"
+    value="Aria compressa tempor."
+    id="accAriaTemp"
+    onchange="toggleQuantityInput(this, 'ariaTempQtyContainer')"
+  />
+  <label class="form-check-label" for="accAriaTemp">
+    Aria compressa tempor.
+  </label>
+</div>
+
+<div class="ms-4 mb-2 d-none" id="ariaTempQtyContainer">
+  <label for="ariaTempFisso" class="form-label">Quantità (piano fisso):</label>
+  <input
+    type="number"
+    id="ariaTempFisso"
+    class="form-control mb-2"
+    min="0"
+    value="0"
+  />
+
+  <label for="ariaTempMobile" class="form-label">Quantità (piano mobile):</label>
+  <input
+    type="number"
+    id="ariaTempMobile"
+    class="form-control"
+    min="0"
+    value="0"
+  />
+</div>
+            
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Otturatore pneum. Ugello stampo" />
+              <label class="form-check-label">Otturatore pneum. Ugello stampo</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Reg. aut. Spess. Stampo e forza chiusura" />
+              <label class="form-check-label">Reg. aut. Spess. Stampo e forza chiusura</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Cancello anteriore autom." />
+              <label class="form-check-label">Cancello anteriore autom.</label>
+            </div>
+            
+            <!-- Centralina risc. Stampo n. zone supplementari (con quantità) -->
+            <div class="form-check mb-2">
+              <input
+                class="form-check-input accCheck"
+                type="checkbox"
+                value="Centralina risc. Stampo n. zone supplementari"
+                id="accCentRisc"
+                onchange="toggleQuantityInput(this, 'centRiscQtyContainer')"
+              />
+              <label class="form-check-label" for="accCentRisc">
+                Centralina risc. Stampo n. zone supplementari
+              </label>
+            </div>
+            <div class="ms-4 mb-2 d-none" id="centRiscQtyContainer">
+              <label for="centRiscQty" class="form-label">
+                Quantità Centralina risc.:
+              </label>
+              <input
+                type="number"
+                id="centRiscQty"
+                class="form-control"
+                min="1"
+                value="1"
+              />
+            </div>
+            
+            <!-- Flussometri supplem. N. (con quantità) -->
+            <div class="form-check mb-2">
+              <input
+                class="form-check-input accCheck"
+                type="checkbox"
+                value="Flussometri supplem. N."
+                id="accFlussometri"
+                onchange="toggleQuantityInput(this, 'flussometriQtyContainer')"
+              />
+              <label class="form-check-label" for="accFlussometri">
+                Flussometri supplem. N.
+              </label>
+            </div>
+            <div class="ms-4 mb-2 d-none" id="flussometriQtyContainer">
+              <label for="flussometriQty" class="form-label">
+                Quantità flussometri supplementari:
+              </label>
+              <input
+                type="number"
+                id="flussometriQty"
+                class="form-control"
+                min="1"
+                value="1"
+              />
+            </div>
+            
+          </div><!-- fine col-md-4 -->
+          
+          <!-- COLONNA 2 (col-md-4) -->
+          <div class="col-md-4">
+            
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Doppia pompa MPW SP" />
+              <label class="form-check-label">Doppia pompa MPW SP</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Arresto macchina totale" />
+              <label class="form-check-label">Arresto macchina totale</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Fotocellula" />
+              <label class="form-check-label">Fotocellula</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Consenso elettr. Dosamaster" />
+              <label class="form-check-label">Consenso elettr. Dosamaster</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Interfaccia per il gas" />
+              <label class="form-check-label">Interfaccia per il gas</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Interfaccia per robot E 12 o 67" />
+              <label class="form-check-label">Interfaccia per robot E 12 o 67</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Interfaccia piani magn. E70" />
+              <label class="form-check-label">Interfaccia piani magn. E70</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Foratura PF per robot" />
+              <label class="form-check-label">Foratura PF per robot</label>
+            </div>
+            
+            <!-- Presa 230V n. (con quantità) -->
+            <div class="form-check mb-2">
+              <input
+                class="form-check-input accCheck"
+                type="checkbox"
+                value="Presa 230V n."
+                id="accPresa230"
+                onchange="toggleQuantityInput(this, 'presa230QtyContainer')"
+              />
+              <label class="form-check-label" for="accPresa230">
+                Presa 230V n.
+              </label>
+            </div>
+            <div class="ms-4 mb-2 d-none" id="presa230QtyContainer">
+              <label for="presa230Qty" class="form-label">
+                Quantità prese 230V:
+              </label>
+              <input
+                type="number"
+                id="presa230Qty"
+                class="form-control"
+                min="1"
+                value="1"
+              />
+            </div>
+            
+            <!-- Presa 400V n. (con quantità) -->
+            <div class="form-check mb-2">
+              <input
+                class="form-check-input accCheck"
+                type="checkbox"
+                value="Presa 400V n."
+                id="accPresa400"
+                onchange="toggleQuantityInput(this, 'presa400QtyContainer')"
+              />
+              <label class="form-check-label" for="accPresa400">
+                Presa 400V n.
+              </label>
+            </div>
+            <div class="ms-4 mb-2 d-none" id="presa400QtyContainer">
+              <label for="presa400Qty" class="form-label">
+                Quantità prese 400V:
+              </label>
+              <input
+                type="number"
+                id="presa400Qty"
+                class="form-control"
+                min="1"
+                value="1"
+              />
+            </div>
+            
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Scivolo" />
+              <label class="form-check-label">Scivolo</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Spegnimento autom presse" />
+              <label class="form-check-label">Spegnimento autom presse</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Stabilizzatore di tensione" />
+              <label class="form-check-label">Stabilizzatore di tensione</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Rilevatore di consumi a bordo macchina" />
+              <label class="form-check-label">Rilevatore di consumi a bordo macchina</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Kit misuraz. Consumo energetico" />
+              <label class="form-check-label">Kit misuraz. Consumo energetico</label>
+            </div>
+            
+          </div><!-- fine col-md-4 -->
+          
+          <!-- COLONNA 3 (col-md-4) -->
+          <div class="col-md-4">
+            
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Connessione Wireless" />
+              <label class="form-check-label">Connessione Wireless</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Canone annuo teleassist." />
+              <label class="form-check-label">Canone annuo teleassist.</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Predisposizione industria 4.0/5.0" />
+              <label class="form-check-label">Predisposizione industria 4.0/5.0</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Certificazione CE" />
+              <label class="form-check-label">Certificazione CE</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Ugello idraulico/pneumatico" />
+              <label class="form-check-label">Ugello idraulico/pneumatico</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Kit materassini coibentati" />
+              <label class="form-check-label">Kit materassini coibentati</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Supll. Cilindro /vite bimetallico" />
+              <label class="form-check-label">Supll. Cilindro /vite bimetallico</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="suppl. vite alta plastif." />
+              <label class="form-check-label">suppl. vite alta plastif.</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Suppl vite policarbonato" />
+              <label class="form-check-label">Suppl vite policarbonato</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Pacchetto PVC rigido" />
+              <label class="form-check-label">Pacchetto PVC rigido</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Attacco rapido estrattore" />
+              <label class="form-check-label">Attacco rapido estrattore</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Estrattore speciale tappi" />
+              <label class="form-check-label">Estrattore speciale tappi</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Verniciatura speciale" />
+              <label class="form-check-label">Verniciatura speciale</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Predisp tavola girev. O piani magnetici" />
+              <label class="form-check-label">Predisp tavola girev. O piani magnetici</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Pieno olio" />
+              <label class="form-check-label">Pieno olio</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Supporti antivibranti" />
+              <label class="form-check-label">Supporti antivibranti</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Staffe fissatempo" />
+              <label class="form-check-label">Staffe fissatempo</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input accCheck" type="checkbox" value="Braccio porta paranco con presisposiz" />
+              <label class="form-check-label">Braccio porta paranco con presisposiz</label>
+            </div>
+            
+          </div><!-- fine col-md-4 -->
+        </div><!-- fine .row -->
+      </div><!-- fine modal-body -->
+      
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Chiudi
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-dismiss="modal"
+          onclick="confermaAccessori()"
+        >
+          Conferma Accessori
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div><!-- fine modal -->
+
+
+<!-- Bootstrap JS -->
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+<script>
+/* =============================================================================
+   1) colTonMap
+   Elenco dei passaggi colonne possibili, ognuno con la lista di tonnellaggi.
+   =============================================================================*/
+const colTonMap = [
+  { colonne: "370x300",  tonList: [50] },
+  { colonne: "410x370",  tonList: [80] },
+  { colonne: "470x470",  tonList: [120] },
+  { colonne: "510x460",  tonList: [160,180] },
+  { colonne: "560x560",  tonList: [220] },
+  { colonne: "630x630",  tonList: [280] },
+  { colonne: "720x720",  tonList: [350] },
+  { colonne: "760x710",  tonList: [400] },
+  { colonne: "810x810",  tonList: [500] },
+  { colonne: "960x920",  tonList: [650] },
+  { colonne: "1120x1020",tonList: [800] },
+  { colonne: "1250x1020",tonList: [1000] },
+  { colonne: "1320x1120",tonList: [1200] },
+  { colonne: "1520x1310",tonList: [1500] },
+  { colonne: "1610x1400",tonList: [1800] },
+  { colonne: "1830x1675",tonList: [2200] },
+  { colonne: "2034x2034",tonList: [2600] },
+  { colonne: "2360x2034",tonList: [3200] },
+  { colonne: "1100x950", tonList: [550,750] },
+  { colonne: "1300x1100",tonList: [950,1150] },
+  { colonne: "1500x1300",tonList: [1450] },
+  { colonne: "1700x1500",tonList: [1750] },
+  { colonne: "1900x1700",tonList: [2050] },
+];
+
+/* =============================================================================
+   2) dettagliEntries
+   Elenco combinazioni (colonne + ton + grammi + unità + modello).
+   Qui inserisci TUTTI i tuoi modelli effettivi.
+   =============================================================================*/
+const dettagliEntries = [
+  
+    // ibrida esp 50
+  {
+    colonne: "370x300", ton: 50, grammi: "20-26",   unita: 50,  modello: "ibrida esp 50"
+  },
+  {
+    colonne: "370x300", ton: 50, grammi: "67-97",   unita: 180, modello: "ibrida esp 50"
+  },
+  {
+    colonne: "370x300", ton: 50, grammi: "106-146", unita: 280, modello: "ibrida esp 50"
+  },
+  {
+    colonne: "370x300", ton: 50, grammi: "155-202", unita: 360, modello: "ibrida esp 50"
+  },
+
+  // ibrida h-he 50
+  {
+    colonne: "370x300", ton: 50, grammi: "20-26",   unita: 50,  modello: "ibrida h-he 50"
+  },
+  {
+    colonne: "370x300", ton: 50, grammi: "67-97",   unita: 180, modello: "ibrida h-he 50"
+  },
+  {
+    colonne: "370x300", ton: 50, grammi: "106-146", unita: 280, modello: "ibrida h-he 50"
+  },
+  {
+    colonne: "370x300", ton: 50, grammi: "155-202", unita: 360, modello: "ibrida h-he 50"
+  },
+
+  // elettryka 50
+  {
+    colonne: "370x300", ton: 50, grammi: "52-66", unita: 140, modello: "elettryka 50"
+  },
+  {
+    colonne: "370x300", ton: 50, grammi: "66-96", unita: 190, modello: "elettryka 50"
+  },
+
+  // ********** 410x370 **********
+  // ibrida esp 80
+  {
+    colonne: "410x370", ton: 80, grammi: "67-97",   unita: 180, modello: "ibrida esp 80"
+  },
+  {
+    colonne: "410x370", ton: 80, grammi: "106-146", unita: 280, modello: "ibrida esp 80"
+  },
+  {
+    colonne: "410x370", ton: 80, grammi: "155-202", unita: 360, modello: "ibrida esp 80"
+  },
+  {
+    colonne: "410x370", ton: 80, grammi: "226-287", unita: 500, modello: "ibrida esp 80"
+  },
+  {
+    colonne: "410x370", ton: 80, grammi: "325-400", unita: 700, modello: "ibrida esp 80"
+  },
+
+  // ibrida h-he 80
+  {
+    colonne: "410x370", ton: 80, grammi: "67-97",   unita: 180, modello: "ibrida h-he 80"
+  },
+  {
+    colonne: "410x370", ton: 80, grammi: "106-146", unita: 280, modello: "ibrida h-he 80"
+  },
+  {
+    colonne: "410x370", ton: 80, grammi: "155-202", unita: 360, modello: "ibrida h-he 80"
+  },
+  {
+    colonne: "410x370", ton: 80, grammi: "226-287", unita: 500, modello: "ibrida h-he 80"
+  },
+  {
+    colonne: "410x370", ton: 80, grammi: "325-400", unita: 700, modello: "ibrida h-he 80"
+  },
+
+  // elettryka 80
+  {
+    colonne: "410x370", ton: 80, grammi: "52-66", unita: 140, modello: "elettryka 80"
+  },
+  {
+    colonne: "410x370", ton: 80, grammi: "66-96", unita: 190, modello: "elettryka 80"
+  },
+
+  // ********** 470x470 **********
+  // ibrida esp 120
+  {
+    colonne: "470x470", ton: 120, grammi: "155-202", unita: 360, modello: "ibrida esp 120"
+  },
+  {
+    colonne: "470x470", ton: 120, grammi: "226-287", unita: 500, modello: "ibrida esp 120"
+  },
+  {
+    colonne: "470x470", ton: 120, grammi: "325-400", unita: 700, modello: "ibrida esp 120"
+  },
+  {
+    colonne: "470x470", ton: 120, grammi: "400-485", unita: 860, modello: "ibrida esp 120"
+  },
+
+  // ibrida h-he 120
+  {
+    colonne: "470x470", ton: 120, grammi: "155-202", unita: 360, modello: "ibrida h-he 120"
+  },
+  {
+    colonne: "470x470", ton: 120, grammi: "226-287", unita: 500, modello: "ibrida h-he 120"
+  },
+  {
+    colonne: "470x470", ton: 120, grammi: "325-400", unita: 700, modello: "ibrida h-he 120"
+  },
+  {
+    colonne: "470x470", ton: 120, grammi: "400-485", unita: 860, modello: "ibrida h-he 120"
+  },
+
+  // elettryka 120
+  {
+    colonne: "470x470", ton: 120, grammi: "66-96",   unita: 190, modello: "elettryka 120"
+  },
+  {
+    colonne: "470x470", ton: 120, grammi: "125-170", unita: 350, modello: "elettryka 120"
+  },
+
+  // ********** 510x460 **********
+  // ibrida esp 160 (ton: [160, 180])
+  {
+    colonne: "510x460", ton: 160, grammi: "226-287", unita: 500, modello: "ibrida esp 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "226-287", unita: 500, modello: "ibrida esp 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "325-400", unita: 700, modello: "ibrida esp 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "325-400", unita: 700, modello: "ibrida esp 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "400-485", unita: 860, modello: "ibrida esp 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "400-485", unita: 860, modello: "ibrida esp 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "560-670", unita: 1200, modello: "ibrida esp 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "560-670", unita: 1200, modello: "ibrida esp 180"
+  },
+
+  // ibrida esp 180 (ton: [160, 180])
+  {
+    colonne: "510x460", ton: 160, grammi: "226-287", unita: 500,  modello: "ibrida esp 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "226-287", unita: 500,  modello: "ibrida esp 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "325-400", unita: 700,  modello: "ibrida esp 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "325-400", unita: 700,  modello: "ibrida esp 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "400-485", unita: 860,  modello: "ibrida esp 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "400-485", unita: 860,  modello: "ibrida esp 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "560-670", unita: 1200, modello: "ibrida esp 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "560-670", unita: 1200, modello: "ibrida esp 180"
+  },
+  
+  {
+    colonne: "510x460", ton: 180, grammi: "670-785", unita: 1350, modello: "ibrida esp 180"
+  },
+
+  // ibrida h-he 160 (ton: [160, 180])
+  {
+    colonne: "510x460", ton: 160, grammi: "226-287", unita: 500, modello: "ibrida h-he 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "226-287", unita: 500, modello: "ibrida h-he 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "325-400", unita: 700, modello: "ibrida h-he 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "325-400", unita: 700, modello: "ibrida h-he 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "400-485", unita: 860, modello: "ibrida h-he 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "400-485", unita: 860, modello: "ibrida h-he 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "560-670", unita: 1200, modello: "ibrida h-he 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "560-670", unita: 1200, modello: "ibrida h-he 180"
+  },
+
+  // ibrida h-he 180 (ton: [160, 180])
+  {
+    colonne: "510x460", ton: 160, grammi: "226-287", unita: 500,  modello: "ibrida h-he 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "226-287", unita: 500,  modello: "ibrida h-he 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "325-400", unita: 700,  modello: "ibrida h-he 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "325-400", unita: 700,  modello: "ibrida h-he 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "400-485", unita: 860,  modello: "ibrida h-he 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "400-485", unita: 860,  modello: "ibrida h-he 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "560-670", unita: 1200, modello: "ibrida h-he 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "560-670", unita: 1200, modello: "ibrida h-he 180"
+  },
+  
+  {
+    colonne: "510x460", ton: 180, grammi: "670-785", unita: 1350, modello: "ibrida h-he 180"
+  },
+
+  // elettryka 160 (ton: [160, 180])
+  {
+    colonne: "510x460", ton: 160, grammi: "125-170", unita: 350, modello: "elettryka 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "125-170", unita: 350, modello: "elettryka 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "195-250", unita: 450, modello: "elettryka 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "195-250", unita: 450, modello: "elettryka 180"
+  },
+
+  // elettryka 180 (ton: [160, 180])
+  {
+    colonne: "510x460", ton: 160, grammi: "195-250", unita: 450, modello: "elettryka 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "195-250", unita: 450, modello: "elettryka 180"
+  },
+  {
+    colonne: "510x460", ton: 160, grammi: "260-330", unita: 630, modello: "elettryka 160"
+  },
+  {
+    colonne: "510x460", ton: 180, grammi: "260-330", unita: 630, modello: "elettryka 180"
+  },
+
+  // ********** 560x560 **********
+  // ibrida esp 220
+  {
+    colonne: "560x560", ton: 220, grammi: "325-400",   unita: 700,  modello: "ibrida esp 220"
+  },
+  {
+    colonne: "560x560", ton: 220, grammi: "400-485",   unita: 860,  modello: "ibrida esp 220"
+  },
+  {
+    colonne: "560x560", ton: 220, grammi: "560-670",   unita: 1200, modello: "ibrida esp 220"
+  },
+  {
+    colonne: "560x560", ton: 220, grammi: "670-785",   unita: 1350, modello: "ibrida esp 220"
+  },
+  {
+    colonne: "560x560", ton: 220, grammi: "1005-1165", unita: 2000, modello: "ibrida esp 220"
+  },
+
+  // ibrida h-he 220
+  {
+    colonne: "560x560", ton: 220, grammi: "325-400",   unita: 700,  modello: "ibrida h-he 220"
+  },
+  {
+    colonne: "560x560", ton: 220, grammi: "400-485",   unita: 860,  modello: "ibrida h-he 220"
+  },
+  {
+    colonne: "560x560", ton: 220, grammi: "560-670",   unita: 1200, modello: "ibrida h-he 220"
+  },
+  {
+    colonne: "560x560", ton: 220, grammi: "670-785",   unita: 1350, modello: "ibrida h-he 220"
+  },
+  {
+    colonne: "560x560", ton: 220, grammi: "1005-1165", unita: 2000, modello: "ibrida h-he 220"
+  },
+
+  // elettryka 220
+  {
+    colonne: "560x560", ton: 220, grammi: "260-330", unita: 630, modello: "elettryka 220"
+  },
+  {
+    colonne: "560x560", ton: 220, grammi: "360-440", unita: 860, modello: "elettryka 220"
+  },
+
+  // ********** 630x630 **********
+  // ibrida esp 280
+  {
+    colonne: "630x630", ton: 280, grammi: "400-485",   unita: 860,  modello: "ibrida esp 280"
+  },
+  {
+    colonne: "630x630", ton: 280, grammi: "560-670",   unita: 1200, modello: "ibrida esp 280"
+  },
+  {
+    colonne: "630x630", ton: 280, grammi: "670-785",   unita: 1350, modello: "ibrida esp 280"
+  },
+  {
+    colonne: "630x630", ton: 280, grammi: "1005-1165", unita: 2000, modello: "ibrida esp 280"
+  },
+  {
+    colonne: "630x630", ton: 280, grammi: "1350-1550", unita: 2800, modello: "ibrida esp 280"
+  },
+
+  // ibrida h-he 280
+  {
+    colonne: "630x630", ton: 280, grammi: "400-485",   unita: 860,  modello: "ibrida h-he 280"
+  },
+  {
+    colonne: "630x630", ton: 280, grammi: "560-670",   unita: 1200, modello: "ibrida h-he 280"
+  },
+  {
+    colonne: "630x630", ton: 280, grammi: "670-785",   unita: 1350, modello: "ibrida h-he 280"
+  },
+  {
+    colonne: "630x630", ton: 280, grammi: "1005-1165", unita: 2000, modello: "ibrida h-he 280"
+  },
+  {
+    colonne: "630x630", ton: 280, grammi: "1350-1550", unita: 2800, modello: "ibrida h-he 280"
+  },
+
+  // elettryka 280
+  {
+    colonne: "630x630", ton: 280, grammi: "360-440", unita: 860,  modello: "elettryka 280"
+  },
+  {
+    colonne: "630x630", ton: 280, grammi: "500-602", unita: 1150, modello: "elettryka 280"
+  },
+
+  // ********** 720x720 **********
+  // ibrida esp 350
+  {
+    colonne: "720x720", ton: 350, grammi: "560-670",   unita: 1200, modello: "ibrida esp 350"
+  },
+  {
+    colonne: "720x720", ton: 350, grammi: "670-785",   unita: 1350, modello: "ibrida esp 350"
+  },
+  {
+    colonne: "720x720", ton: 350, grammi: "1005-1165", unita: 2000, modello: "ibrida esp 350"
+  },
+  {
+    colonne: "720x720", ton: 350, grammi: "1350-1550", unita: 2800, modello: "ibrida esp 350"
+  },
+
+  // ibrida h-he 350
+  {
+    colonne: "720x720", ton: 350, grammi: "560-670",   unita: 1200, modello: "ibrida h-he 350"
+  },
+  {
+    colonne: "720x720", ton: 350, grammi: "670-785",   unita: 1350, modello: "ibrida h-he 350"
+  },
+  {
+    colonne: "720x720", ton: 350, grammi: "1005-1165", unita: 2000, modello: "ibrida h-he 350"
+  },
+  {
+    colonne: "720x720", ton: 350, grammi: "1350-1550", unita: 2800, modello: "ibrida h-he 350"
+  },
+
+  // elettryka 350
+  {
+    colonne: "720x720", ton: 350, grammi: "500-602", unita: 1150, modello: "elettryka 350"
+  },
+  {
+    colonne: "720x720", ton: 350, grammi: "602-718", unita: 1350, modello: "elettryka 350"
+  },
+
+  // ********** 760x710 **********
+  // ibrida esp 400
+  {
+    colonne: "760x710", ton: 400, grammi: "1005-1165", unita: 2000, modello: "ibrida esp 400"
+  },
+  {
+    colonne: "760x710", ton: 400, grammi: "1350-1550", unita: 2800, modello: "ibrida esp 400"
+  },
+  {
+    colonne: "760x710", ton: 400, grammi: "1730-2230", unita: 4050, modello: "ibrida esp 400"
+  },
+  {
+    colonne: "760x710", ton: 400, grammi: "2346-2632", unita: 5050, modello: "ibrida esp 400"
+  },
+
+  // ibrida h-he 400
+  {
+    colonne: "760x710", ton: 400, grammi: "1005-1165", unita: 2000, modello: "ibrida h-he 400"
+  },
+  {
+    colonne: "760x710", ton: 400, grammi: "1350-1550", unita: 2800, modello: "ibrida h-he 400"
+  },
+  {
+    colonne: "760x710", ton: 400, grammi: "1730-2230", unita: 4050, modello: "ibrida h-he 400"
+  },
+  {
+    colonne: "760x710", ton: 400, grammi: "2346-2632", unita: 5050, modello: "ibrida h-he 400"
+  },
+
+  // ********** 810x810 **********
+  // ibrida esp 500
+  {
+    colonne: "810x810", ton: 500, grammi: "1005-1165", unita: 2000, modello: "ibrida esp 500"
+  },
+  {
+    colonne: "810x810", ton: 500, grammi: "1350-1550", unita: 2800, modello: "ibrida esp 500"
+  },
+  {
+    colonne: "810x810", ton: 500, grammi: "1730-2230", unita: 4050, modello: "ibrida esp 500"
+  },
+  {
+    colonne: "810x810", ton: 500, grammi: "2346-2632", unita: 5050, modello: "ibrida esp 500"
+  },
+  {
+    colonne: "810x810", ton: 500, grammi: "3082-4195", unita: 7200, modello: "ibrida esp 500"
+  },
+
+  // ibrida h-he 500
+  {
+    colonne: "810x810", ton: 500, grammi: "1005-1165", unita: 2000, modello: "ibrida h-he 500"
+  },
+  {
+    colonne: "810x810", ton: 500, grammi: "1350-1550", unita: 2800, modello: "ibrida h-he 500"
+  },
+  {
+    colonne: "810x810", ton: 500, grammi: "1730-2230", unita: 4050, modello: "ibrida h-he 500"
+  },
+  {
+    colonne: "810x810", ton: 500, grammi: "2346-2632", unita: 5050, modello: "ibrida h-he 500"
+  },
+  {
+    colonne: "810x810", ton: 500, grammi: "3082-4195", unita: 7200, modello: "ibrida h-he 500"
+  },
+
+  // ********** 960x920 **********
+  // ibrida esp 650
+  {
+    colonne: "960x920", ton: 650, grammi: "1350-1550", unita: 2800, modello: "ibrida esp 650"
+  },
+  {
+    colonne: "960x920", ton: 650, grammi: "1730-2230", unita: 4050, modello: "ibrida esp 650"
+  },
+  {
+    colonne: "960x920", ton: 650, grammi: "2346-2632", unita: 5050, modello: "ibrida esp 650"
+  },
+  {
+    colonne: "960x920", ton: 650, grammi: "3082-4195", unita: 7200, modello: "ibrida esp 650"
+  },
+
+  // ibrida h-he 650
+  {
+    colonne: "960x920", ton: 650, grammi: "1350-1550", unita: 2800, modello: "ibrida h-he 650"
+  },
+  {
+    colonne: "960x920", ton: 650, grammi: "1730-2230", unita: 4050, modello: "ibrida h-he 650"
+  },
+  {
+    colonne: "960x920", ton: 650, grammi: "2346-2632", unita: 5050, modello: "ibrida h-he 650"
+  },
+  {
+    colonne: "960x920", ton: 650, grammi: "3082-4195", unita: 7200, modello: "ibrida h-he 650"
+  },
+
+  // ********** 1120x1020 **********
+  // ibrida esp 800
+  {
+    colonne: "1120x1020", ton: 800, grammi: "1730-2230", unita: 4050, modello: "ibrida esp 800"
+  },
+  {
+    colonne: "1120x1020", ton: 800, grammi: "2346-2632", unita: 5050, modello: "ibrida esp 800"
+  },
+  {
+    colonne: "1120x1020", ton: 800, grammi: "3082-4195", unita: 7200, modello: "ibrida esp 800"
+  },
+  {
+    colonne: "1120x1020", ton: 800, grammi: "3700-6550", unita: 9300, modello: "ibrida esp 800"
+  },
+
+  // ibrida h-he 800
+  {
+    colonne: "1120x1020", ton: 800, grammi: "1730-2230", unita: 4050, modello: "ibrida h-he 800"
+  },
+  {
+    colonne: "1120x1020", ton: 800, grammi: "2346-2632", unita: 5050, modello: "ibrida h-he 800"
+  },
+  {
+    colonne: "1120x1020", ton: 800, grammi: "3082-4195", unita: 7200, modello: "ibrida h-he 800"
+  },
+  {
+    colonne: "1120x1020", ton: 800, grammi: "3700-6550", unita: 9300, modello: "ibrida h-he 800"
+  },
+
+  // ********** 1250x1020 (ibrida 1000) **********
+  {
+    colonne: "1250x1020", ton: 1000, grammi: "3082-4195", unita: 7200,  modello: "ibrida 1000"
+  },
+  {
+    colonne: "1250x1020", ton: 1000, grammi: "3700-6550", unita: 9300,  modello: "ibrida 1000"
+  },
+  {
+    colonne: "1250x1020", ton: 1000, grammi: "5155-8520", unita: 12400, modello: "ibrida 1000"
+  },
+
+  // ********** 1320x1120 (ibrida 1200) **********
+  {
+    colonne: "1320x1120", ton: 1200, grammi: "3700-6550",  unita: 9300,  modello: "ibrida 1200"
+  },
+  {
+    colonne: "1320x1120", ton: 1200, grammi: "5155-8520",  unita: 12400, modello: "ibrida 1200"
+  },
+  {
+    colonne: "1320x1120", ton: 1200, grammi: "7575-11820", unita: 16300, modello: "ibrida 1200"
+  },
+
+  // ********** 1520x1310 (ibrida 1500) **********
+  {
+    colonne: "1520x1310", ton: 1500, grammi: "3700-6550",  unita: 9300,  modello: "ibrida 1500"
+  },
+  {
+    colonne: "1520x1310", ton: 1500, grammi: "5155-8520",  unita: 12400, modello: "ibrida 1500"
+  },
+  {
+    colonne: "1520x1310", ton: 1500, grammi: "7575-11820", unita: 16300, modello: "ibrida 1500"
+  },
+  {
+    colonne: "1520x1310", ton: 1500, grammi: "9085-14200", unita: 20700, modello: "ibrida 1500"
+  },
+
+  // ********** 1610x1400 (ibrida 1800) **********
+  {
+    colonne: "1610x1400", ton: 1800, grammi: "5155-8520",  unita: 12400, modello: "ibrida 1800"
+  },
+  {
+    colonne: "1610x1400", ton: 1800, grammi: "7575-11820", unita: 16300, modello: "ibrida 1800"
+  },
+  {
+    colonne: "1610x1400", ton: 1800, grammi: "9085-14200", unita: 20700, modello: "ibrida 1800"
+  },
+  {
+    colonne: "1610x1400", ton: 1800, grammi: "10820-17160", unita: 25600, modello: "ibrida 1800"
+  },
+
+  // ********** 1830x1675 (ibrida 2200) **********
+  {
+    colonne: "1830x1675", ton: 2200, grammi: "7575-11820",  unita: 16300, modello: "ibrida 2200"
+  },
+  {
+    colonne: "1830x1675", ton: 2200, grammi: "9085-14200",  unita: 20700, modello: "ibrida 2200"
+  },
+  {
+    colonne: "1830x1675", ton: 2200, grammi: "10820-17160", unita: 25600, modello: "ibrida 2200"
+  },
+  {
+    colonne: "1830x1675", ton: 2200, grammi: "21020-29090", unita: 44500, modello: "ibrida 2200"
+  },
+
+  // ********** 2034x2034 (ibrida 2600) **********
+  {
+    colonne: "2034x2034", ton: 2600, grammi: "9085-14200",  unita: 20700, modello: "ibrida 2600"
+  },
+  {
+    colonne: "2034x2034", ton: 2600, grammi: "10820-17160", unita: 25600, modello: "ibrida 2600"
+  },
+  {
+    colonne: "2034x2034", ton: 2600, grammi: "21020-29090", unita: 44500, modello: "ibrida 2600"
+  },
+  {
+    colonne: "2034x2034", ton: 2600, grammi: "28900-39400", unita: 70000, modello: "ibrida 2600"
+  },
+
+  // ********** 2360x2034 (ibrida 3200) **********
+  {
+    colonne: "2360x2034", ton: 3200, grammi: "10820-17160", unita: 25600, modello: "ibrida 3200"
+  },
+  {
+    colonne: "2360x2034", ton: 3200, grammi: "21020-29090", unita: 44500, modello: "ibrida 3200"
+  },
+  {
+    colonne: "2360x2034", ton: 3200, grammi: "28900-39400", unita: 70000, modello: "ibrida 3200"
+  },
+
+  // ********** sp/h duo 1100x950 **********
+  // sp/h duo 550 (ton: [550,750])
+  {
+    colonne: "1100x950", ton: 550, grammi: "1390-2296", unita: 3300, modello: "sp/h duo 550"
+  },
+  {
+    colonne: "1100x950", ton: 750, grammi: "1390-2296", unita: 3300, modello: "sp/h duo 550"
+  },
+  {
+    colonne: "1100x950", ton: 550, grammi: "2128-3320", unita: 5300, modello: "sp/h duo 550"
+  },
+  {
+    colonne: "1100x950", ton: 750, grammi: "2128-3320", unita: 5300, modello: "sp/h duo 550"
+  },
+  // sp/h duo 750
+  {
+    colonne: "1100x950", ton: 550, grammi: "2128-3320", unita: 5300, modello: "sp/h duo 750"
+  },
+  {
+    colonne: "1100x950", ton: 750, grammi: "2128-3320", unita: 5300, modello: "sp/h duo 750"
+  },
+  {
+    colonne: "1100x950", ton: 550, grammi: "2990-4468", unita: 7100, modello: "sp/h duo 750"
+  },
+  {
+    colonne: "1100x950", ton: 750, grammi: "2990-4468", unita: 7100, modello: "sp/h duo 750"
+  },
+
+  // ********** sp/h duo 1300x1100 **********
+  // sp/h duo 950 (ton: [950,1150])
+  {
+    colonne: "1300x1100", ton: 950,  grammi: "2128-3320", unita: 5300, modello: "sp/h duo 950"
+  },
+  
+  {
+    colonne: "1300x1100", ton: 950,  grammi: "2990-4468", unita: 7100, modello: "sp/h duo 950"
+  },
+  {
+    colonne: "1300x1100", ton: 1150, grammi: "2990-4468", unita: 7100, modello: "sp/h duo 1150"
+  },
+
+  // sp/h duo 1150 (ton: [950,1150])
+  {
+    colonne: "1300x1100", ton: 950,  grammi: "2990-4468", unita: 7100,  modello: "sp/h duo 950"
+  },
+  {
+    colonne: "1300x1100", ton: 1150, grammi: "2990-4468", unita: 7100,  modello: "sp/h duo 1150"
+  },
+  {
+    colonne: "1300x1100", ton: 950,  grammi: "4060-5850", unita: 9600,  modello: "sp/h duo 950"
+  },
+  {
+    colonne: "1300x1100", ton: 1150, grammi: "4060-5850", unita: 9600,  modello: "sp/h duo 1150"
+  },
+  
+  {
+    colonne: "1300x1100", ton: 1150, grammi: "6910-9410", unita: 15000, modello: "sp/h duo 1150"
+  },
+
+  // ********** sp/h duo 1500x1300 **********
+  // sp/h duo 1450
+  {
+    colonne: "1500x1300", ton: 1450, grammi: "4060-5850",  unita: 9600,  modello: "sp/h duo 1450"
+  },
+  {
+    colonne: "1500x1300", ton: 1450, grammi: "6910-9410",  unita: 15000, modello: "sp/h duo 1450"
+  },
+  {
+    colonne: "1500x1300", ton: 1450, grammi: "8735-11630", unita: 20000, modello: "sp/h duo 1450"
+  },
+
+  // ********** sp/h duo 1700x1500 **********
+  // sp/h duo 1750
+  {
+    colonne: "1700x1500", ton: 1750, grammi: "8735-11630",  unita: 20000, modello: "sp/h duo 1750"
+  },
+  {
+    colonne: "1700x1500", ton: 1750, grammi: "11580-19140", unita: 30000, modello: "sp/h duo 1750"
+  },
+
+  // ********** sp/h duo 1900x1700 **********
+  // sp/h duo 2050
+  {
+    colonne: "1900x1700", ton: 2050, grammi: "11580-19140", unita: 30000, modello: "sp/h duo 2050"
+  },
+  {
+    colonne: "1900x1700", ton: 2050, grammi: "16286-25447", unita: 45000, modello: "sp/h duo 2050"
+  }
+
+];
+
+/* =============================================================================
+   3) Recupero di TUTTI i ton possibili, per proporre i "ton vicini" se non c'è match
+   =============================================================================*/
+const allTonsSorted = (() => {
+  // Unisci tutti i ton presenti in colTonMap, rimuovi duplicati, ordina
+  const setT = new Set();
+  colTonMap.forEach(obj => {
+    obj.tonList.forEach(t => setT.add(t));
+  });
+  return Array.from(setT).sort((a,b) => a-b);
+})();
+
+/* =============================================================================
+   4) Funzioni di calcolo "vicini" per passaggio colonne
+   (come già fatto nel tuo codice)
+   =============================================================================*/
+function parseColonne(str){
+  const parts = str.split('x').map(s=> parseInt(s.trim(),10));
+  if(parts.length!==2 || isNaN(parts[0])|| isNaN(parts[1])) return null;
+  return parts;
+}
+
+function trovaIntervalliViciniColonne(colStr){
+  const inputArr = parseColonne(colStr);
+  if(!inputArr) return [];
+  
+  // calcola la distanza da ogni colTonMap
+  const distanze = colTonMap.map(obj=>{
+    const cArr = parseColonne(obj.colonne);
+    if(!cArr) return { dist:999999, col:obj.colonne };
+    const dx = cArr[0] - inputArr[0];
+    const dy = cArr[1] - inputArr[1];
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    return { dist, col:obj.colonne };
+  });
+  distanze.sort((a,b)=> a.dist - b.dist);
+  // prendi i 2 più vicini
+  return distanze.slice(0,2).map(d=> d.col);
+}
+
+function mostraIntervalliViciniColonne(colVal){
+  const divV = document.getElementById("divColonneVicini");
+  const selV = document.getElementById("colonneViciniSelect");
+  selV.innerHTML="<option value=''>Scegli un passaggio simile</option>";
+
+  const vicini = trovaIntervalliViciniColonne(colVal);
+  vicini.forEach(v=>{
+    const opt = document.createElement("option");
+    opt.value = v;
+    opt.textContent = v;
+    selV.appendChild(opt);
+  });
+  divV.classList.remove("d-none");
+}
+
+function nascondiIntervalliViciniColonne(){
+  document.getElementById("divColonneVicini").classList.add("d-none");
+  document.getElementById("colonneViciniSelect").innerHTML="<option value=''>Scegli un passaggio simile</option>";
+}
+
+function onSelezionaColonneVicino(){
+  const val = document.getElementById("colonneViciniSelect").value;
+  if(!val) return;
+  document.getElementById("colonneInput").value = val;
+  nascondiIntervalliViciniColonne();
+  onColonneChange();
+}
+
+/* =============================================================================
+   5) Funzioni di calcolo "vicini" per Tonnellaggio
+   (nuovo: se l'utente digita un ton che non esiste, proponiamo i 2 più vicini)
+   =============================================================================*/
+function trovaTonnellaggiVicini(tonVal){
+  // Calcolo la distanza tra tonVal e ogni ton in allTonsSorted
+  const distanze = allTonsSorted.map(t => {
+    return { dist: Math.abs(t - tonVal), ton: t };
+  });
+  distanze.sort((a,b) => a.dist - b.dist);
+  // prendi i 2 più vicini
+  return distanze.slice(0,2).map(d => d.ton);
+}
+
+function mostraTonnellaggiVicini(tonVal){
+  const divT = document.getElementById("divTonVicini");
+  const selT = document.getElementById("tonViciniSelect");
+  selT.innerHTML="<option value=''>Scegli un tonnellaggio simile</option>";
+
+  const vicini = trovaTonnellaggiVicini(tonVal);
+  vicini.forEach(v=>{
+    const opt = document.createElement("option");
+    opt.value = v;
+    opt.textContent = v;
+    selT.appendChild(opt);
+  });
+  divT.classList.remove("d-none");
+}
+
+function nascondiTonnellaggiVicini(){
+  document.getElementById("divTonVicini").classList.add("d-none");
+  document.getElementById("tonViciniSelect").innerHTML="<option value=''>Scegli un tonnellaggio simile</option>";
+}
+
+function onSelezionaTonVicino(){
+  const val = document.getElementById("tonViciniSelect").value;
+  if(!val) return;
+  // Metto questo valore in tonInput
+  document.getElementById("tonInput").value = val;
+  nascondiTonnellaggiVicini();
+  // Richiamo onTonChange() per proseguire con la normale logica
+  onTonChange();
+}
+
+/* =============================================================================
+   6) onColonneChange
+   =============================================================================*/
+function onColonneChange(){
+  const col = document.getElementById("colonneInput").value.trim();
+  mostraImgChiusura(col);
+
+  // nascondo eventuali proposte di ton vicini (non c'entrano)
+  nascondiTonnellaggiVicini();
+
+  // nascondo i passaggi colonne vicini
+  nascondiIntervalliViciniColonne();
+
+  // pulisco e nascondo il select multiplo
+  document.getElementById("tonSceltaMultiple").classList.add("d-none");
+  document.getElementById("tonSceltaMultiple").innerHTML = "<option value=''>Scegli un tonnellaggio</option>";
+
+  const match = colTonMap.find(ct => ct.colonne === col);
+  if(!match){
+    // propone i col vicini
+    mostraIntervalliViciniColonne(col);
+    document.getElementById("tonInput").value="";
+    return;
+  }
+
+  // Se c’è match => guardiamo quanti ton sono in tonList
+  if(match.tonList.length === 1){
+    // Se è un solo ton, lo metto direttamente
+    document.getElementById("tonInput").value = match.tonList[0];
+    mostraImgTon(match.tonList[0]);
+  } else {
+    // 2+ => popola tonSceltaMultiple
+    const sel= document.getElementById("tonSceltaMultiple");
+    sel.innerHTML="<option value=''>Scegli un tonnellaggio</option>";
+    match.tonList.forEach(t=>{
+      const opt= document.createElement("option");
+      opt.value= t;
+      opt.textContent= t;
+      sel.appendChild(opt);
+    });
+    sel.classList.remove("d-none");
+
+    // Svuoto l'input Tonnellaggio
+    document.getElementById("tonInput").value = "";
+    document.getElementById("imgTon").classList.add("d-none");
+    document.getElementById("imgTon").src="";
+  }
+
+  // Se col e tonVal validi => popolaGrammi()
+  const tonVal = parseInt(document.getElementById("tonInput").value,10);
+  if(col && !isNaN(tonVal)){
+    popolaGrammi();
+  }
+}
+
+/* =============================================================================
+   7) onTonChange
+   Gestisce quando l'utente modifica "manualmente" il tonnellaggio.
+   =============================================================================*/
+function onTonChange(){
+  const val = parseInt(document.getElementById("tonInput").value,10);
+
+  // nascondo il select multiple ton
+  document.getElementById("tonSceltaMultiple").classList.add("d-none");
+  document.getElementById("tonSceltaMultiple").innerHTML="<option value=''>Scegli un tonnellaggio</option>";
+
+  // nascondo eventuali proposte di ton vicini
+  nascondiTonnellaggiVicini();
+
+  if(isNaN(val)){
+    document.getElementById("imgTon").classList.add("d-none");
+    document.getElementById("imgTon").src="";
+    return;
+  }
+  // Se ton è un numero => mostro immagine ton
+  mostraImgTon(val);
+
+  // Trova passaggi colonne compatibili
+  const possibles = colTonMap.filter(ct=> ct.tonList.includes(val));
+
+  if(possibles.length === 1){
+    // c'è un solo passaggio => lo imposto
+    document.getElementById("colonneInput").value = possibles[0].colonne;
+    mostraImgChiusura(possibles[0].colonne);
+    nascondiIntervalliViciniColonne();
+  } 
+  else if(possibles.length > 1){
+    // ci sono più passaggi possibili => avviso e non setto niente
+    alert("Possibili passaggi colonne: " + possibles.map(x=> x.colonne).join(", "));
+    // Se vuoi, svuoti il passaggio colonne, oppure lasci com’era
+    document.getElementById("colonneInput").value = "";
+    nascondiIntervalliViciniColonne();
+  }
+  else {
+    // nessun match => proponiamo i ton vicini
+    document.getElementById("colonneInput").value = "";
+    mostraTonnellaggiVicini(val);
+    return;
+  }
+
+  // Se adesso ho di nuovo colonne + ton, popolo la grammatura
+  const ccol = document.getElementById("colonneInput").value.trim();
+  if(ccol && !isNaN(val)){
+    popolaGrammi();
+  }
+}
+
+/* =============================================================================
+   8) onTonSelezionatoDaSelect
+   Quando l'utente seleziona un ton dal <select> multiplo (se ci sono 2+ ton)
+   =============================================================================*/
+function onTonSelezionatoDaSelect(){
+  const select = document.getElementById("tonSceltaMultiple");
+  const valore = select.value;
+  // Se l'utente ha effettivamente scelto qualcosa
+  if(valore){
+    document.getElementById("tonInput").value = valore;
+    mostraImgTon(valore);
+    popolaGrammi(); // adesso che ho ton, popolo la grammatura
+  } else {
+    // se mette l'option vuota
+    document.getElementById("tonInput").value = "";
+    document.getElementById("imgTon").classList.add("d-none");
+    document.getElementById("imgTon").src="";
+  }
+}
+
+/* =============================================================================
+   9) popolaGrammi, popolaUnita, popolaModello
+   =============================================================================*/
+function popolaGrammi(){
+  const col = document.getElementById("colonneInput").value.trim();
+  const tonVal = parseInt(document.getElementById("tonInput").value,10);
+
+  const gramSel = document.getElementById("grammiSelect");
+  gramSel.innerHTML = "<option value=''>Seleziona la capacità effettiva iniezione</option>";
+  gramSel.disabled = true;
+
+  if(!col || isNaN(tonVal)) return;
+
+  const filtered = dettagliEntries.filter(e=>
+    e.colonne===col && e.ton===tonVal
+  );
+  if(!filtered.length) return;
+
+  const used = new Set();
+  filtered.forEach(e=>{
+    if(!used.has(e.grammi)){
+      used.add(e.grammi);
+      const opt = document.createElement("option");
+      opt.value = e.grammi;
+      opt.textContent = e.grammi;
+      gramSel.appendChild(opt);
+    }
+  });
+  if(used.size) gramSel.disabled = false;
+}
+
+function popolaUnita(){
+  const col = document.getElementById("colonneInput").value.trim();
+  const tonVal = parseInt(document.getElementById("tonInput").value,10);
+  const grammi= document.getElementById("grammiSelect").value;
+
+  const uSel= document.getElementById("unitaSelect");
+  uSel.innerHTML="<option value=''>Seleziona un'unità di iniezione</option>";
+  uSel.disabled=true;
+
+  document.getElementById("modelloSelect").innerHTML="<option value=''>Seleziona il modello</option>";
+  document.getElementById("modelloSelect").disabled=true;
+
+  if(!col|| isNaN(tonVal)|| !grammi) return;
+
+  const filtered= dettagliEntries.filter(e=>
+    e.colonne===col && e.ton===tonVal && e.grammi===grammi
+  );
+  const used= new Set(filtered.map(f=> f.unita));
+  used.forEach(u=>{
+    const opt= document.createElement("option");
+    opt.value=u;
+    opt.textContent=`Unità ${u}`;
+    uSel.appendChild(opt);
+  });
+  if(used.size) uSel.disabled=false;
+}
+
+function popolaModello(){
+  const col = document.getElementById("colonneInput").value.trim();
+  const tonVal = parseInt(document.getElementById("tonInput").value,10);
+  const grammi= document.getElementById("grammiSelect").value;
+  const unita= parseInt(document.getElementById("unitaSelect").value,10);
+
+  const mSel= document.getElementById("modelloSelect");
+  mSel.innerHTML="<option value=''>Seleziona il modello</option>";
+  mSel.disabled=true;
+
+  if(!col|| isNaN(tonVal)|| !grammi|| isNaN(unita))return;
+
+  const filtered= dettagliEntries.filter(e=>
+    e.colonne===col && e.ton===tonVal && e.grammi===grammi && e.unita===unita
+  );
+  const used= new Set(filtered.map(f=> f.modello));
+  used.forEach(m=>{
+    const opt= document.createElement("option");
+    opt.value= m;
+    opt.textContent= m;
+    mSel.appendChild(opt);
+  });
+  if(used.size) mSel.disabled=false;
+}
+
+/* =============================================================================
+   10) Mostra immagini: vite, iniezione, chiusura, ton
+   =============================================================================*/
+function mostraImgVite(){
+  const grammi = document.getElementById("grammiSelect").value;
+  const img = document.getElementById("imgVite");
+  if(grammi){
+    img.src="img/vite.jpg";
+    img.classList.remove("d-none");
+  } else {
+    img.classList.add("d-none");
+    img.src="";
+  }
+}
+
+function mostraImgIniezione(){
+  const unita= document.getElementById("unitaSelect").value;
+  const img= document.getElementById("imgIniezione");
+  if(unita){
+    img.src="img/iniezione.jpg";
+    img.classList.remove("d-none");
+  } else {
+    img.classList.add("d-none");
+    img.src="";
+  }
+}
+
+function mostraImgChiusura(col){
+  const img= document.getElementById("imgChiusura");
+  if(!col){
+    img.classList.add("d-none");
+    img.src="";
+    return;
+  }
+  if(
+    col==="1100x950" ||
+    col==="1300x1100" ||
+    col==="1500x1300" ||
+    col==="1700x1500" ||
+    col==="1900x1700"
+  ){
+    img.src="img/trenostampiduo.jpg";
+  } else {
+    img.src="img/treno stampi.jpg";
+  }
+  img.classList.remove("d-none");
+}
+
+function mostraImgTon(ton){
+  const img= document.getElementById("imgTon");
+  if(!ton){
+    img.classList.add("d-none");
+    img.src="";
+    return;
+  }
+  img.src="img/ton.jpg";
+  img.classList.remove("d-none");
+}
+
+/* =============================================================================
+   11) Configura Pressa
+   =============================================================================*/
+function configuraPressa(){
+  const col = document.getElementById("colonneInput").value.trim();
+  const tonVal= document.getElementById("tonInput").value;
+  const grammi= document.getElementById("grammiSelect").value;
+  const unita= document.getElementById("unitaSelect").value;
+  const modello= document.getElementById("modelloSelect").value;
+
+  if(!col||!tonVal||!grammi||!unita||!modello){
+    alert("Compila tutti i campi (Colonne, Tonnellaggio, Grammatura, Unità, Modello).");
+    return;
+  }
+
+  document.getElementById("risultati").innerHTML = `
+    <h4>Configurazione completata</h4>
+    <p><strong>Passaggio colonne:</strong> ${col}</p>
+    <p><strong>Tonnellaggio:</strong> ${tonVal}</p>
+    <p><strong>Grammatura:</strong> ${grammi}</p>
+    <p><strong>Unità di iniezione:</strong> ${unita}</p>
+    <p><strong>Modello:</strong> ${modello}</p>
+  `;
+
+  mostraImmagineFinale(modello);
+
+  // sblocco pulsanti
+  document.getElementById("btnAccessori").classList.remove("d-none");
+  document.getElementById("btnAzzeraAccessori").classList.remove("d-none");
+}
+
+function mostraImmagineFinale(modello){
+  const ctn = document.getElementById("finalImageContainer");
+  const img = document.getElementById("finalModelImage");
+  ctn.classList.remove("d-none");
+  const low= modello.toLowerCase();
+  if(low.includes("duo")){
+    img.src= "img/duo.jpg";
+  } 
+  else if(low.includes("sp ")){
+    img.src= "img/SP.JPG";
+  }
+  else if(low.includes("h-he") || low.includes("elettryka")){
+    img.src= "img/HE.JPG";
+  } else {
+    img.src="";
+  }
+}
+
+/* =============================================================================
+   12) Azzera Filtri
+   =============================================================================*/
+function azzeraFiltri(){
+  document.getElementById("colonneInput").value="";
+  document.getElementById("tonInput").value="";
+
+  nascondiIntervalliViciniColonne();
+  nascondiTonnellaggiVicini();
+
+  // nascondo e pulisco select multiplo ton
+  const ts = document.getElementById("tonSceltaMultiple");
+  ts.classList.add("d-none");
+  ts.innerHTML = "<option value=''>Scegli un tonnellaggio</option>";
+
+  // Grammatura
+  const gs= document.getElementById("grammiSelect");
+  gs.innerHTML= "<option value=''>Seleziona la capacità effettiva iniezione</option>";
+  gs.disabled=true;
+
+  // Unità
+  const us= document.getElementById("unitaSelect");
+  us.innerHTML= "<option value=''>Seleziona un'unità di iniezione</option>";
+  us.disabled=true;
+
+  // Modello
+  const ms= document.getElementById("modelloSelect");
+  ms.innerHTML= "<option value=''>Seleziona il modello</option>";
+  ms.disabled=true;
+
+  // nascondi img
+  document.getElementById("imgChiusura").classList.add("d-none");
+  document.getElementById("imgChiusura").src="";
+  document.getElementById("imgTon").classList.add("d-none");
+  document.getElementById("imgTon").src="";
+  document.getElementById("imgVite").classList.add("d-none");
+  document.getElementById("imgVite").src="";
+  document.getElementById("imgIniezione").classList.add("d-none");
+  document.getElementById("imgIniezione").src="";
+
+  document.getElementById("risultati").innerHTML="";
+  document.getElementById("finalImageContainer").classList.add("d-none");
+  document.getElementById("finalModelImage").src="";
+
+  document.getElementById("btnAccessori").classList.add("d-none");
+  document.getElementById("btnAzzeraAccessori").classList.add("d-none");
+
+  // Accessori
+  const allChecks= document.querySelectorAll(".accCheck");
+  allChecks.forEach(ch=> ch.checked=false);
+
+  // nascondi i container doppio quantity
+  document.getElementById("martIdrQtyContainer").classList.add("d-none");
+  document.getElementById("martIdrFissoQty").value="0";
+  document.getElementById("martIdrMobileQty").value="0";
+
+  document.getElementById("martPneQtyContainer").classList.add("d-none");
+  document.getElementById("martPneFissoQty").value="0";
+  document.getElementById("martPneMobileQty").value="0";
+
+  document.getElementById("ariaTempQtyContainer").classList.add("d-none");
+  document.getElementById("ariaTempFisso").value="0";
+  document.getElementById("ariaTempMobile").value="0";
+}
+
+/* =============================================================================
+   13) Azzera Accessori
+   =============================================================================*/
+function azzeraAccessoriFinal(){
+  const accLine = document.getElementById("accessoriLine");
+  if(accLine) accLine.remove();
+
+  const allChecks= document.querySelectorAll(".accCheck");
+  allChecks.forEach(ch=> ch.checked=false);
+
+  document.getElementById("martIdrQtyContainer").classList.add("d-none");
+  document.getElementById("martIdrFissoQty").value="0";
+  document.getElementById("martIdrMobileQty").value="0";
+
+  document.getElementById("martPneQtyContainer").classList.add("d-none");
+  document.getElementById("martPneFissoQty").value="0";
+  document.getElementById("martPneMobileQty").value="0";
+
+  document.getElementById("ariaTempQtyContainer").classList.add("d-none");
+  document.getElementById("ariaTempFisso").value="0";
+  document.getElementById("ariaTempMobile").value="0";
+}
+
+/* =============================================================================
+   14) confermaAccessori
+   =============================================================================*/
+function toggleQuantityInput(checkbox, containerId){
+  const ctn = document.getElementById(containerId);
+  if(checkbox.checked){
+    ctn.classList.remove("d-none");
+  } else {
+    ctn.classList.add("d-none");
+  }
+}
+
+/*
+  5) Accessori: confermaAccessori legge i checkbox con class="accCheck"
+*/
+function confermaAccessori() {
+  const allChecks = document.querySelectorAll(".accCheck");
+  const selez = [];
+
+  allChecks.forEach(ch => {
+    if (ch.checked) {
+       // 1) Martinetti idraulici
+      if (ch.id === "accMartinettiIdr") {
+        // Leggi le DUE quantità
+        const fisso = document.getElementById("martIdrFissoQty").value;
+        const mobile = document.getElementById("martIdrMobileQty").value;
+        selez.push(`Martinetti idraulici (piano fisso x${fisso}, piano mobile x${mobile})`);
+      }
+      // 2) Martinetti pneumatici
+      else if (ch.id === "accMartinettiPne") {
+        const fissoPne = document.getElementById("martPneFissoQty").value;
+        const mobilePne = document.getElementById("martPneMobileQty").value;
+        selez.push(`Martinetti pneumatici (piano fisso x${fissoPne}, piano mobile x${mobilePne})`);
+      
+      }
+      else if (ch.id === "accCentRisc") {
+        const crQty = document.getElementById("centRiscQty").value;
+        selez.push(`Centralina risc. (x${crQty})`);
+      }
+      else if (ch.id === "accFlussometri") {
+        const flQty = document.getElementById("flussometriQty").value;
+        selez.push(`Flussometri supplem. N. (x${flQty})`);
+      }
+      else if (ch.id === "accPresa230") {
+        const p230 = document.getElementById("presa230Qty").value;
+        selez.push(`Presa 230V n. (x${p230})`);
+      }
+      else if (ch.id === "accPresa400") {
+        const p400 = document.getElementById("presa400Qty").value;
+        selez.push(`Presa 400V n. (x${p400})`);
+      }
+      else if (ch.id === "accAriaTemp") {
+  const fisso = document.getElementById("ariaTempFisso").value;
+  const mobile = document.getElementById("ariaTempMobile").value;
+  selez.push(`Aria compressa tempor. (piano fisso x${fisso}, piano mobile x${mobile})`);
+}
+
+      else {
+        selez.push(ch.value);
+      }
+    }
+  });
+
+  const ris = document.getElementById("risultati");
+  // Rimuovo eventuale riga Accessori esistente
+  const old = document.getElementById("accessoriLine");
+  if(old) old.remove();
+
+  if(selez.length>0){
+    ris.innerHTML += `
+      <p id="accessoriLine">
+        <strong>Accessori:</strong> ${selez.join(", ")}
+      </p>
+    `;
+  } else {
+    ris.innerHTML += `
+      <p id="accessoriLine">
+        <strong>Accessori:</strong> Nessuno
+      </p>
+    `;
+  }
+}
+/*
+ azzera accesori
+*/
+
+function azzeraAccessoriFinal() {
+  // 1) Deseleziona tutti i checkbox .accCheck
+  const allChecks = document.querySelectorAll(".accCheck");
+  allChecks.forEach(ch => {
+    ch.checked = false;
+  });
+
+  // 2) Nascondi i container “quantità” e reimposta i campi numerici a "1"
+  const qtyContainers = [
+    "martIdrQtyContainer",
+    "martPneQtyContainer",
+    "ariaTempQtyContainer",
+    "centRiscQtyContainer",
+    "flussometriQtyContainer",
+    "presa230QtyContainer",
+    "presa400QtyContainer"
+    // ... se ne hai altri, aggiungili qui ...
+  ];
+  qtyContainers.forEach(cid => {
+    document.getElementById(cid).classList.add("d-none");
+    const inp = document.getElementById(cid).querySelector("input[type='number']");
+    if (inp) inp.value = "1";
+  });
+
+  // 3) Rimuovi tutte le righe del riepilogo che compaiono “DOPO” la riga “Modello:”
+  //    Supponendo che “Modello:” sia in un <p> e che tutti i paragrafi successivi
+  //    (come “Accessori:...”) vengano dopo.
+   document.getElementById("martIdrFissoQty").value = "0";
+  document.getElementById("martIdrMobileQty").value = "0";
+  document.getElementById("martPneFissoQty").value = "0";
+  document.getElementById("martPneMobileQty").value = "0";
+   document.getElementById("ariaTempFisso").value = "0";
+  document.getElementById("ariaTempMobile").value = "0";
+const ris = document.getElementById("risultati");
+  if (ris) {
+    const paragraphs = ris.querySelectorAll("p");
+    let foundModello = false;
+
+    paragraphs.forEach(par => {
+      // Se abbiamo già trovato la riga con "Modello:" in precedenza,
+      // rimuoviamo questo paragrafo.
+      if (foundModello) {
+        par.remove();
+      }
+      // Se questa riga contiene "Modello:", la contrassegniamo come “trovata”
+      if (par.innerText.includes("Modello:")) {
+        foundModello = true;
+      }
+    });
+  }
+}
+</script>
+
+</body>
+</html>
