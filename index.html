@@ -6,7 +6,7 @@
 
   <!-- Bootstrap CSS -->
   <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     rel="stylesheet"
   >
   <meta
@@ -14,14 +14,14 @@
     content="width=device-width, initial-scale=1.0"
   >
   <style>
-    /* Qualche regola rapida per le immagini, se vuoi dimensioni uniformi */
     .config-img {
-      width: 280px;
+      /* L’immagine non supererà i 280px; 
+         se lo spazio è inferiore, si restringe (img-fluid) */
+      max-width: 280px; 
       height: auto;
-      object-fit: contain; /* per non deformare */
-      margin: 0 5px; /* piccolo distanziamento orizzontale */
+      object-fit: contain; /* facoltativo */
     }
-    .d-none {display: none;}
+    /* Rimuovo .d-none con display none, come da bootstrap */
   </style>
 </head>
 <body>
@@ -31,56 +31,76 @@
 
   <!-- ============================= RIGA 1: Colonne + Ton + Immagini ============================= -->
   <div class="row">
-    <!-- Colonna sinistra: Passaggio colonne e Tonnellaggio, uno sotto l'altro -->
-    <div class="col-md-6">
-      <!-- Passaggio colonne -->
+    <!-- Usiamo col-6: 2 colonne fisse su ogni schermo -->
+    <div class="col-6">
+      
+      <!-- Passaggio colonne (2 input per H e V) -->
       <div class="mb-3">
-        <label for="colonneInput" class="form-label">
-          Passaggio colonne (HxV)
-        </label>
+        <label class="form-label">Passaggio colonne (inserisci H e V)</label>
+        <div class="row g-2">
+          <div class="col">
+            <input
+              type="number"
+              id="colonneHInput"
+              class="form-control"
+              placeholder="H"
+              onchange="onColonneWHChange()"
+            />
+          </div>
+          <div class="col">
+            <input
+              type="number"
+              id="colonneVInput"
+              class="form-control"
+              placeholder="V"
+              onchange="onColonneWHChange()"
+            />
+          </div>
+        </div>
+        <!-- Campo nascosto/readonly in cui salviamo la stringa finale “HxV” -->
         <input
           type="text"
           id="colonneInput"
-          class="form-control"
-          placeholder="es. 370x300"
-          onchange="onColonneChange()"
+          class="form-control d-none"
+          readonly
         />
       </div>
-<div class="mb-3 d-none" id="divColonneVicini">
-  <label for="colonneViciniSelect" class="form-label">
-    Non trovato. Seleziona un passaggio colonne vicino:
-  </label>
-  <select 
-    id="colonneViciniSelect" 
-    class="form-select"
-    onchange="onSelezionaColonneVicino()"
-  >
-    <option value="">Scegli un passaggio simile</option>
-  </select>
-</div>
 
+      <!-- Selettore passaggio colonne vicini -->
+      <div class="mb-3 d-none" id="divColonneVicini">
+        <label for="colonneViciniSelect" class="form-label">
+          Non trovato. Seleziona un passaggio colonne vicino:
+        </label>
+        <select 
+          id="colonneViciniSelect" 
+          class="form-select"
+          onchange="onSelezionaColonneVicino()"
+        >
+          <option value="">Scegli un passaggio simile</option>
+        </select>
+      </div>
+
+      <!-- Tonnellaggio -->
       <div class="mb-3">
-  <label for="tonInput" class="form-label">
-    Tonnellaggio
-  </label>
-  <input
-    type="text"
-    id="tonInput"
-    class="form-control"
-    placeholder="es. 80"
-    onchange="onTonChange()"
-  />
-  <!-- il tuo select multiplo -->
-  <select
-    id="tonSceltaMultiple"
-    class="form-select d-none mt-2"
-    onchange="onTonSelezionatoDaSelect()"
-  >
-    <option value="">Scegli un tonnellaggio</option>
-  </select>
-</div>
+        <label for="tonInput" class="form-label">Tonnellaggio</label>
+        <input
+          type="text"
+          id="tonInput"
+          class="form-control"
+          placeholder="es. 80"
+          onchange="onTonChange()"
+        />
+        <!-- Select multiplo (es: per col 510x460 con ton 160 e 180) -->
+        <select
+          id="tonSceltaMultiple"
+          class="form-select d-none mt-2"
+          onchange="onTonSelezionatoDaSelect()"
+        >
+          <option value="">Scegli un tonnellaggio</option>
+        </select>
+      </div>
 
-      <!-- Ton vicini (nuova sezione, nascosta di default) -->
+      <!-- Ton vicini -->
       <div class="mb-3 d-none" id="divTonVicini">
         <label for="tonViciniSelect" class="form-label">
           Non trovato. Seleziona un tonnellaggio vicino:
@@ -94,35 +114,22 @@
         </select>
       </div>
 
-      <!-- Eventuale div “Intervalli vicini” per il passaggio colonne -->
-      <div class="mb-3 d-none" id="divColonneVicini">
-        <label for="colonneViciniSelect" class="form-label">
-          Non trovato. Seleziona un passaggio colonne vicino:
-        </label>
-        <select 
-          id="colonneViciniSelect" 
-          class="form-select"
-          onchange="onSelezionaColonneVicino()"
-        >
-          <option value="">Scegli un passaggio simile</option>
-        </select>
-      </div>
     </div>
 
-    <!-- Colonna destra: 2 immagini affiancate (Chiusura + Ton) -->
-    <div class="col-md-6 d-flex align-items-center">
+    <!-- Seconda colonna: immagini affiancate (Chiusura + Tonnellaggio) -->
+    <div class="col-6 d-flex align-items-center">
       <div>
         <img
           id="imgChiusura"
           src=""
           alt="Chiusura"
-          class="config-img d-none"
+          class="config-img img-fluid d-none"
         />
         <img
           id="imgTon"
           src=""
           alt="Tonnellaggio"
-          class="config-img d-none"
+          class="config-img img-fluid d-none"
         />
       </div>
     </div>
@@ -130,9 +137,8 @@
 
   <!-- ============================= RIGA 2: Grammatura + Unita + Modello + Immagini (vite/iniezione) ============================= -->
   <div class="row mt-4">
-    <!-- Colonna sinistra: Grammatura, Unità, Modello, + pulsanti Configura/Azzera -->
-    <div class="col-md-6">
-      <!-- Grammatura -->
+    <!-- Prima colonna: Grammatura, Unità, Modello, etc. -->
+    <div class="col-6">
       <div class="mb-3">
         <label for="grammiSelect" class="form-label">
           Capacità effettiva iniezione (grammi)
@@ -162,9 +168,7 @@
 
       <!-- Modello -->
       <div class="mb-3">
-        <label for="modelloSelect" class="form-label">
-          Modello
-        </label>
+        <label for="modelloSelect" class="form-label">Modello</label>
         <select
           id="modelloSelect"
           class="form-select"
@@ -193,20 +197,20 @@
       </div>
     </div>
 
-    <!-- Colonna destra: 2 immagini affiancate (vite e iniezione) -->
-    <div class="col-md-6 d-flex align-items-center">
+    <!-- Seconda colonna: immagini (vite e iniezione) -->
+    <div class="col-6 d-flex align-items-center">
       <div>
         <img
           id="imgVite"
           src=""
           alt="Vite"
-          class="config-img d-none"
+          class="config-img img-fluid d-none"
         />
         <img
           id="imgIniezione"
           src=""
           alt="Iniezione"
-          class="config-img d-none"
+          class="config-img img-fluid d-none"
         />
       </div>
     </div>
@@ -214,8 +218,8 @@
 
   <!-- ============================= RIGA 3: Riepilogo, Accessori, Immagine finale ============================= -->
   <div class="row mt-4">
-    <!-- Col riepilogo + bottoni Accessori / Azzera Accessori -->
-    <div class="col-md-6">
+    <!-- Prima colonna: Riepilogo, pulsanti Accessori -->
+    <div class="col-6">
       <div id="risultati"></div>
 
       <div class="mt-3 d-flex gap-3">
@@ -239,8 +243,8 @@
       </div>
     </div>
 
-    <!-- Col immagine finale configurata -->
-    <div class="col-md-6">
+    <!-- Seconda colonna: immagine finale -->
+    <div class="col-6">
       <div id="finalImageContainer" class="d-none">
         <img
           id="finalModelImage"
@@ -283,75 +287,74 @@
           <!-- col-md-4 (1) -->
           <div class="col-md-4">
             
-           <!-- Martinetti idraulici -->
-<div class="form-check mb-2">
-  <input
-    class="form-check-input accCheck"
-    type="checkbox"
-    value="Martinetti idraulici"
-    id="accMartinettiIdr"
-    onchange="toggleQuantityInput(this, 'martIdrQtyContainer')"
-  />
-  <label class="form-check-label" for="accMartinettiIdr">
-    Martinetti idraulici
-  </label>
-</div>
+            <!-- Martinetti idraulici -->
+            <div class="form-check mb-2">
+              <input
+                class="form-check-input accCheck"
+                type="checkbox"
+                value="Martinetti idraulici"
+                id="accMartinettiIdr"
+                onchange="toggleQuantityInput(this, 'martIdrQtyContainer')"
+              />
+              <label class="form-check-label" for="accMartinettiIdr">
+                Martinetti idraulici
+              </label>
+            </div>
 
-<!-- Div nascosto con DUE campi: piano fisso e piano mobile -->
-<div class="ms-4 mb-2 d-none" id="martIdrQtyContainer">
-  <label for="martIdrFissoQty" class="form-label">Quantità (piano fisso):</label>
-  <input
-    type="number"
-    id="martIdrFissoQty"
-    class="form-control mb-2"
-    min="0"
-    value="0"
-  />
+            <!-- Div nascosto con DUE campi: piano fisso e piano mobile -->
+            <div class="ms-4 mb-2 d-none" id="martIdrQtyContainer">
+              <label for="martIdrFissoQty" class="form-label">Quantità (piano fisso):</label>
+              <input
+                type="number"
+                id="martIdrFissoQty"
+                class="form-control mb-2"
+                min="0"
+                value="0"
+              />
+              <label for="martIdrMobileQty" class="form-label">Quantità (piano mobile):</label>
+              <input
+                type="number"
+                id="martIdrMobileQty"
+                class="form-control"
+                min="0"
+                value="0"
+              />
+            </div>
 
-  <label for="martIdrMobileQty" class="form-label">Quantità (piano mobile):</label>
-  <input
-    type="number"
-    id="martIdrMobileQty"
-    class="form-control"
-    min="0"
-    value="0"
-  />
-</div>
+            <!-- Martinetti pneumatici -->
+            <div class="form-check mb-2">
+              <input
+                class="form-check-input accCheck"
+                type="checkbox"
+                value="Martinetti pneumatici"
+                id="accMartinettiPne"
+                onchange="toggleQuantityInput(this, 'martPneQtyContainer')"
+              />
+              <label class="form-check-label" for="accMartinettiPne">
+                Martinetti pneumatici
+              </label>
+            </div>
 
-<!-- Martinetti pneumatici -->
-<div class="form-check mb-2">
-  <input
-    class="form-check-input accCheck"
-    type="checkbox"
-    value="Martinetti pneumatici"
-    id="accMartinettiPne"
-    onchange="toggleQuantityInput(this, 'martPneQtyContainer')"
-  />
-  <label class="form-check-label" for="accMartinettiPne">
-    Martinetti pneumatici
-  </label>
-</div>
+            <!-- Div nascosto con DUE campi: piano fisso e piano mobile -->
+            <div class="ms-4 mb-2 d-none" id="martPneQtyContainer">
+              <label for="martPneFissoQty" class="form-label">Quantità (piano fisso):</label>
+              <input
+                type="number"
+                id="martPneFissoQty"
+                class="form-control mb-2"
+                min="0"
+                value="0"
+              />
 
-<!-- Div nascosto con DUE campi: piano fisso e piano mobile -->
-<div class="ms-4 mb-2 d-none" id="martPneQtyContainer">
-  <label for="martPneFissoQty" class="form-label">Quantità (piano fisso):</label>
-  <input
-    type="number"
-    id="martPneFissoQty"
-    class="form-control mb-2"
-    min="0"
-    value="0"
-  />
-
-  <label for="martPneMobileQty" class="form-label">Quantità (piano mobile):</label>
-  <input
-    type="number"
-    id="martPneMobileQty"
-    class="form-control"
-    min="0"
-    value="0"
-  />
-</div>
+              <label for="martPneMobileQty" class="form-label">Quantità (piano mobile):</label>
+              <input
+                type="number"
+                id="martPneMobileQty"
+                class="form-control"
+                min="0"
+                value="0"
+              />
+            </div>
 
             
             <div class="form-check mb-2">
@@ -366,41 +369,40 @@
               <input class="form-check-input accCheck" type="checkbox" value="Serbatoio aria compressa" />
               <label class="form-check-label">Serbatoio aria compressa</label>
             </div>
-            
+
             <!-- Aria compressa tempor. (con doppia quantità) -->
-<div class="form-check mb-2">
-  <input
-    class="form-check-input accCheck"
-    type="checkbox"
-    value="Aria compressa tempor."
-    id="accAriaTemp"
-    onchange="toggleQuantityInput(this, 'ariaTempQtyContainer')"
-  />
-  <label class="form-check-label" for="accAriaTemp">
-    Aria compressa tempor.
-  </label>
-</div>
+            <div class="form-check mb-2">
+              <input
+                class="form-check-input accCheck"
+                type="checkbox"
+                value="Aria compressa tempor."
+                id="accAriaTemp"
+                onchange="toggleQuantityInput(this, 'ariaTempQtyContainer')"
+              />
+              <label class="form-check-label" for="accAriaTemp">
+                Aria compressa tempor.
+              </label>
+            </div>
+            <div class="ms-4 mb-2 d-none" id="ariaTempQtyContainer">
+              <label for="ariaTempFisso" class="form-label">Quantità (piano fisso):</label>
+              <input
+                type="number"
+                id="ariaTempFisso"
+                class="form-control mb-2"
+                min="0"
+                value="0"
+              />
 
-<div class="ms-4 mb-2 d-none" id="ariaTempQtyContainer">
-  <label for="ariaTempFisso" class="form-label">Quantità (piano fisso):</label>
-  <input
-    type="number"
-    id="ariaTempFisso"
-    class="form-control mb-2"
-    min="0"
-    value="0"
-  />
+              <label for="ariaTempMobile" class="form-label">Quantità (piano mobile):</label>
+              <input
+                type="number"
+                id="ariaTempMobile"
+                class="form-control"
+                min="0"
+                value="0"
+              />
+            </div>
 
-  <label for="ariaTempMobile" class="form-label">Quantità (piano mobile):</label>
-  <input
-    type="number"
-    id="ariaTempMobile"
-    class="form-control"
-    min="0"
-    value="0"
-  />
-</div>
-            
             <div class="form-check mb-2">
               <input class="form-check-input accCheck" type="checkbox" value="Otturatore pneum. Ugello stampo" />
               <label class="form-check-label">Otturatore pneum. Ugello stampo</label>
@@ -439,7 +441,7 @@
                 value="1"
               />
             </div>
-            
+
             <!-- Flussometri supplem. N. (con quantità) -->
             <div class="form-check mb-2">
               <input
@@ -684,13 +686,50 @@
 
 <!-- Bootstrap JS -->
 <script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
 ></script>
 
 <script>
+/* ============================================================
+   A) Funzione per impostare i campi #colonneHInput, #colonneVInput e #colonneInput
+   con una stringa "HxV".
+   ============================================================ */
+function setColonneHV(colStr) {
+  const parts = colStr.split('x');
+  if (parts.length !== 2) return;
+
+  const h = parseInt(parts[0], 10);
+  const v = parseInt(parts[1], 10);
+
+  // Se i parse non sono validi, esco
+  if (isNaN(h) || isNaN(v)) return;
+
+  // Imposto i campi
+  document.getElementById("colonneHInput").value = h;
+  document.getElementById("colonneVInput").value = v;
+  document.getElementById("colonneInput").value   = colStr;
+}
+
+/* ============================================================
+   B) onColonneWHChange: se l'utente digita H e V manualmente
+   costruiamo la stringa e la mettiamo in #colonneInput
+   ============================================================ */
+function onColonneWHChange() {
+  const hVal = parseInt(document.getElementById("colonneHInput").value, 10);
+  const vVal = parseInt(document.getElementById("colonneVInput").value, 10);
+  const colInput = document.getElementById("colonneInput");
+
+  if (!isNaN(hVal) && !isNaN(vVal)) {
+    colInput.value = `${hVal}x${vVal}`;
+  } else {
+    colInput.value = "";
+  }
+  // Avvia la logica di popolamento
+  onColonneChange();
+}
+
 /* =============================================================================
    1) colTonMap
-   Elenco dei passaggi colonne possibili, ognuno con la lista di tonnellaggi.
    =============================================================================*/
 const colTonMap = [
   { colonne: "370x300",  tonList: [50] },
@@ -720,9 +759,9 @@ const colTonMap = [
 
 /* =============================================================================
    2) dettagliEntries
-   Elenco combinazioni (colonne + ton + grammi + unità + modello).
-   Qui inserisci TUTTI i tuoi modelli effettivi.
    =============================================================================*/
+// (Lo lasci identico al tuo, con tutti i modelli)
+
 const dettagliEntries = [
   
     // ibrida esp 50
@@ -1408,20 +1447,18 @@ const dettagliEntries = [
 ];
 
 /* =============================================================================
-   3) Recupero di TUTTI i ton possibili, per proporre i "ton vicini" se non c'è match
+   3) Tonnellaggi “globali” (per i “ton vicini”)
    =============================================================================*/
 const allTonsSorted = (() => {
-  // Unisci tutti i ton presenti in colTonMap, rimuovi duplicati, ordina
   const setT = new Set();
   colTonMap.forEach(obj => {
     obj.tonList.forEach(t => setT.add(t));
   });
-  return Array.from(setT).sort((a,b) => a-b);
+  return Array.from(setT).sort((a,b) => a - b);
 })();
 
 /* =============================================================================
    4) Funzioni di calcolo "vicini" per passaggio colonne
-   (come già fatto nel tuo codice)
    =============================================================================*/
 function parseColonne(str){
   const parts = str.split('x').map(s=> parseInt(s.trim(),10));
@@ -1433,7 +1470,6 @@ function trovaIntervalliViciniColonne(colStr){
   const inputArr = parseColonne(colStr);
   if(!inputArr) return [];
   
-  // calcola la distanza da ogni colTonMap
   const distanze = colTonMap.map(obj=>{
     const cArr = parseColonne(obj.colonne);
     if(!cArr) return { dist:999999, col:obj.colonne };
@@ -1443,7 +1479,6 @@ function trovaIntervalliViciniColonne(colStr){
     return { dist, col:obj.colonne };
   });
   distanze.sort((a,b)=> a.dist - b.dist);
-  // prendi i 2 più vicini
   return distanze.slice(0,2).map(d=> d.col);
 }
 
@@ -1470,22 +1505,19 @@ function nascondiIntervalliViciniColonne(){
 function onSelezionaColonneVicino(){
   const val = document.getElementById("colonneViciniSelect").value;
   if(!val) return;
-  document.getElementById("colonneInput").value = val;
+  setColonneHV(val); // e richiama la logica
   nascondiIntervalliViciniColonne();
   onColonneChange();
 }
 
 /* =============================================================================
    5) Funzioni di calcolo "vicini" per Tonnellaggio
-   (nuovo: se l'utente digita un ton che non esiste, proponiamo i 2 più vicini)
    =============================================================================*/
 function trovaTonnellaggiVicini(tonVal){
-  // Calcolo la distanza tra tonVal e ogni ton in allTonsSorted
   const distanze = allTonsSorted.map(t => {
     return { dist: Math.abs(t - tonVal), ton: t };
   });
   distanze.sort((a,b) => a.dist - b.dist);
-  // prendi i 2 più vicini
   return distanze.slice(0,2).map(d => d.ton);
 }
 
@@ -1512,10 +1544,8 @@ function nascondiTonnellaggiVicini(){
 function onSelezionaTonVicino(){
   const val = document.getElementById("tonViciniSelect").value;
   if(!val) return;
-  // Metto questo valore in tonInput
   document.getElementById("tonInput").value = val;
   nascondiTonnellaggiVicini();
-  // Richiamo onTonChange() per proseguire con la normale logica
   onTonChange();
 }
 
@@ -1526,31 +1556,26 @@ function onColonneChange(){
   const col = document.getElementById("colonneInput").value.trim();
   mostraImgChiusura(col);
 
-  // nascondo eventuali proposte di ton vicini (non c'entrano)
   nascondiTonnellaggiVicini();
-
-  // nascondo i passaggi colonne vicini
   nascondiIntervalliViciniColonne();
 
-  // pulisco e nascondo il select multiplo
-  document.getElementById("tonSceltaMultiple").classList.add("d-none");
-  document.getElementById("tonSceltaMultiple").innerHTML = "<option value=''>Scegli un tonnellaggio</option>";
+  const tonSel = document.getElementById("tonSceltaMultiple");
+  tonSel.classList.add("d-none");
+  tonSel.innerHTML = "<option value=''>Scegli un tonnellaggio</option>";
 
   const match = colTonMap.find(ct => ct.colonne === col);
   if(!match){
-    // propone i col vicini
-    mostraIntervalliViciniColonne(col);
+    // Se non c'è match, proponi i passaggi vicini
+    if(col) mostraIntervalliViciniColonne(col);
     document.getElementById("tonInput").value="";
     return;
   }
 
-  // Se c’è match => guardiamo quanti ton sono in tonList
   if(match.tonList.length === 1){
-    // Se è un solo ton, lo metto direttamente
     document.getElementById("tonInput").value = match.tonList[0];
     mostraImgTon(match.tonList[0]);
   } else {
-    // 2+ => popola tonSceltaMultiple
+    // Più ton => popolo la select
     const sel= document.getElementById("tonSceltaMultiple");
     sel.innerHTML="<option value=''>Scegli un tonnellaggio</option>";
     match.tonList.forEach(t=>{
@@ -1560,14 +1585,11 @@ function onColonneChange(){
       sel.appendChild(opt);
     });
     sel.classList.remove("d-none");
-
-    // Svuoto l'input Tonnellaggio
     document.getElementById("tonInput").value = "";
     document.getElementById("imgTon").classList.add("d-none");
     document.getElementById("imgTon").src="";
   }
 
-  // Se col e tonVal validi => popolaGrammi()
   const tonVal = parseInt(document.getElementById("tonInput").value,10);
   if(col && !isNaN(tonVal)){
     popolaGrammi();
@@ -1576,16 +1598,14 @@ function onColonneChange(){
 
 /* =============================================================================
    7) onTonChange
-   Gestisce quando l'utente modifica "manualmente" il tonnellaggio.
    =============================================================================*/
 function onTonChange(){
   const val = parseInt(document.getElementById("tonInput").value,10);
 
-  // nascondo il select multiple ton
-  document.getElementById("tonSceltaMultiple").classList.add("d-none");
-  document.getElementById("tonSceltaMultiple").innerHTML="<option value=''>Scegli un tonnellaggio</option>";
+  const ts = document.getElementById("tonSceltaMultiple");
+  ts.classList.add("d-none");
+  ts.innerHTML="<option value=''>Scegli un tonnellaggio</option>";
 
-  // nascondo eventuali proposte di ton vicini
   nascondiTonnellaggiVicini();
 
   if(isNaN(val)){
@@ -1593,33 +1613,29 @@ function onTonChange(){
     document.getElementById("imgTon").src="";
     return;
   }
-  // Se ton è un numero => mostro immagine ton
   mostraImgTon(val);
 
-  // Trova passaggi colonne compatibili
+  // cerco passaggi in colTonMap che abbiano tonList.includes(val)
   const possibles = colTonMap.filter(ct=> ct.tonList.includes(val));
-
   if(possibles.length === 1){
-    // c'è un solo passaggio => lo imposto
-    document.getElementById("colonneInput").value = possibles[0].colonne;
+    // Se c'è un solo passaggio => lo imposto
+    setColonneHV(possibles[0].colonne);
     mostraImgChiusura(possibles[0].colonne);
     nascondiIntervalliViciniColonne();
-  } 
-  else if(possibles.length > 1){
-    // ci sono più passaggi possibili => avviso e non setto niente
+  } else if(possibles.length > 1){
+    // Più passaggi => avviso
     alert("Possibili passaggi colonne: " + possibles.map(x=> x.colonne).join(", "));
-    // Se vuoi, svuoti il passaggio colonne, oppure lasci com’era
-    document.getElementById("colonneInput").value = "";
+    // Pulisco
+    setColonneHV("");
     nascondiIntervalliViciniColonne();
-  }
-  else {
-    // nessun match => proponiamo i ton vicini
-    document.getElementById("colonneInput").value = "";
+  } else {
+    // Nessun match => ton vicini
+    setColonneHV("");
     mostraTonnellaggiVicini(val);
     return;
   }
 
-  // Se adesso ho di nuovo colonne + ton, popolo la grammatura
+  // Se abbiamo colonne + ton, popolaGrammi
   const ccol = document.getElementById("colonneInput").value.trim();
   if(ccol && !isNaN(val)){
     popolaGrammi();
@@ -1628,18 +1644,15 @@ function onTonChange(){
 
 /* =============================================================================
    8) onTonSelezionatoDaSelect
-   Quando l'utente seleziona un ton dal <select> multiplo (se ci sono 2+ ton)
    =============================================================================*/
 function onTonSelezionatoDaSelect(){
   const select = document.getElementById("tonSceltaMultiple");
   const valore = select.value;
-  // Se l'utente ha effettivamente scelto qualcosa
   if(valore){
     document.getElementById("tonInput").value = valore;
     mostraImgTon(valore);
-    popolaGrammi(); // adesso che ho ton, popolo la grammatura
+    popolaGrammi();
   } else {
-    // se mette l'option vuota
     document.getElementById("tonInput").value = "";
     document.getElementById("imgTon").classList.add("d-none");
     document.getElementById("imgTon").src="";
@@ -1814,7 +1827,6 @@ function configuraPressa(){
 
   mostraImmagineFinale(modello);
 
-  // sblocco pulsanti
   document.getElementById("btnAccessori").classList.remove("d-none");
   document.getElementById("btnAzzeraAccessori").classList.remove("d-none");
 }
@@ -1841,33 +1853,32 @@ function mostraImmagineFinale(modello){
    12) Azzera Filtri
    =============================================================================*/
 function azzeraFiltri(){
+  // Pulisco i 2 campi H e V, e la stringa
+  document.getElementById("colonneHInput").value="";
+  document.getElementById("colonneVInput").value="";
   document.getElementById("colonneInput").value="";
+
   document.getElementById("tonInput").value="";
 
   nascondiIntervalliViciniColonne();
   nascondiTonnellaggiVicini();
 
-  // nascondo e pulisco select multiplo ton
   const ts = document.getElementById("tonSceltaMultiple");
   ts.classList.add("d-none");
   ts.innerHTML = "<option value=''>Scegli un tonnellaggio</option>";
 
-  // Grammatura
   const gs= document.getElementById("grammiSelect");
   gs.innerHTML= "<option value=''>Seleziona la capacità effettiva iniezione</option>";
   gs.disabled=true;
 
-  // Unità
   const us= document.getElementById("unitaSelect");
   us.innerHTML= "<option value=''>Seleziona un'unità di iniezione</option>";
   us.disabled=true;
 
-  // Modello
   const ms= document.getElementById("modelloSelect");
   ms.innerHTML= "<option value=''>Seleziona il modello</option>";
   ms.disabled=true;
 
-  // nascondi img
   document.getElementById("imgChiusura").classList.add("d-none");
   document.getElementById("imgChiusura").src="";
   document.getElementById("imgTon").classList.add("d-none");
@@ -1884,11 +1895,9 @@ function azzeraFiltri(){
   document.getElementById("btnAccessori").classList.add("d-none");
   document.getElementById("btnAzzeraAccessori").classList.add("d-none");
 
-  // Accessori
   const allChecks= document.querySelectorAll(".accCheck");
   allChecks.forEach(ch=> ch.checked=false);
 
-  // nascondi i container doppio quantity
   document.getElementById("martIdrQtyContainer").classList.add("d-none");
   document.getElementById("martIdrFissoQty").value="0";
   document.getElementById("martIdrMobileQty").value="0";
@@ -1937,9 +1946,6 @@ function toggleQuantityInput(checkbox, containerId){
   }
 }
 
-/*
-  5) Accessori: confermaAccessori legge i checkbox con class="accCheck"
-*/
 function confermaAccessori() {
   const allChecks = document.querySelectorAll(".accCheck");
   const selez = [];
@@ -1958,7 +1964,6 @@ function confermaAccessori() {
         const fissoPne = document.getElementById("martPneFissoQty").value;
         const mobilePne = document.getElementById("martPneMobileQty").value;
         selez.push(`Martinetti pneumatici (piano fisso x${fissoPne}, piano mobile x${mobilePne})`);
-      
       }
       else if (ch.id === "accCentRisc") {
         const crQty = document.getElementById("centRiscQty").value;
@@ -1977,11 +1982,10 @@ function confermaAccessori() {
         selez.push(`Presa 400V n. (x${p400})`);
       }
       else if (ch.id === "accAriaTemp") {
-  const fisso = document.getElementById("ariaTempFisso").value;
-  const mobile = document.getElementById("ariaTempMobile").value;
-  selez.push(`Aria compressa tempor. (piano fisso x${fisso}, piano mobile x${mobile})`);
-}
-
+        const fisso = document.getElementById("ariaTempFisso").value;
+        const mobile = document.getElementById("ariaTempMobile").value;
+        selez.push(`Aria compressa tempor. (piano fisso x${fisso}, piano mobile x${mobile})`);
+      }
       else {
         selez.push(ch.value);
       }
@@ -1989,7 +1993,6 @@ function confermaAccessori() {
   });
 
   const ris = document.getElementById("risultati");
-  // Rimuovo eventuale riga Accessori esistente
   const old = document.getElementById("accessoriLine");
   if(old) old.remove();
 
@@ -2008,7 +2011,10 @@ function confermaAccessori() {
   }
 }
 /*
- azzera accesori
+  Qui incolli tutto il tuo JavaScript (onColonneWHChange, onTonChange,
+  funzioni per popolare i select, funzioni di azzeramento, ecc.)
+  L’unica differenza è che ho sostituito i "col-md-6" con "col-6"
+  per avere 2 colonne fisse su tutte le larghezze.
 */
 
 function azzeraAccessoriFinal() {
